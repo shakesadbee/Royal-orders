@@ -18,9 +18,9 @@ client.once(Events.ClientReady, () => {
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
+  // ORDER COMMAND
   if (interaction.commandName === "order") {
 
-    // Only server owner
     if (interaction.guild.ownerId !== interaction.user.id) {
       return interaction.reply({
         content: "❌ Only the server owner can use this command.",
@@ -35,7 +35,6 @@ client.on(Events.InteractionCreate, async interaction => {
     const channel = interaction.options.getChannel("channel");
     const image = interaction.options.getAttachment("image");
 
-    // Load order counter
     const data = JSON.parse(
       fs.readFileSync("./orders.json", "utf8")
     );
@@ -65,13 +64,11 @@ client.on(Events.InteractionCreate, async interaction => {
         },
         {
           name: "📦 Service",
-          value: service,
-          inline: false
+          value: service
         },
         {
           name: "📝 Details",
-          value: details,
-          inline: false
+          value: details
         }
       )
       .setTimestamp();
@@ -84,29 +81,31 @@ client.on(Events.InteractionCreate, async interaction => {
       embeds: [embed]
     });
 
-    await interaction.reply({
+    return interaction.reply({
       content: `✅ Order #${orderId} created.`,
+      ephemeral: true
+    });
+  }
+
+  // SAY COMMAND
+  if (interaction.commandName === "say") {
+
+    if (interaction.guild.ownerId !== interaction.user.id) {
+      return interaction.reply({
+        content: "❌ Only the server owner can use this command.",
+        ephemeral: true
+      });
+    }
+
+    const message = interaction.options.getString("message");
+
+    await interaction.channel.send(message);
+
+    return interaction.reply({
+      content: "✅ Message sent.",
       ephemeral: true
     });
   }
 });
 
 client.login(process.env.TOKEN);
-if (interaction.commandName === "say") {
-
-  if (interaction.guild.ownerId !== interaction.user.id) {
-    return interaction.reply({
-      content: "❌ Only the server owner can use this command.",
-      ephemeral: true
-    });
-  }
-
-  const message = interaction.options.getString("message");
-
-  await interaction.channel.send(message);
-
-  return interaction.reply({
-    content: "✅ Message sent.",
-    ephemeral: true
-  });
-}

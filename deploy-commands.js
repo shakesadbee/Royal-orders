@@ -1,6 +1,7 @@
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const commands = [
+
   new SlashCommandBuilder()
     .setName("order")
     .setDescription("Create a new order")
@@ -33,7 +34,42 @@ const commands = [
         .setDescription("Message to send")
         .setRequired(true)
     )
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName("vouch")
+    .setDescription("Give a vouch to a user")
+    .addUserOption(option =>
+      option
+        .setName("user")
+        .setDescription("User to vouch")
+        .setRequired(true)
+    )
+    .addStringOption(option =>
+      option
+        .setName("message")
+        .setDescription("Vouch message")
+        .setRequired(true)
+    )
+    .addChannelOption(option =>
+      option
+        .setName("channel")
+        .setDescription("Channel to send the vouch")
+        .setRequired(true)
+    )
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName("vouchcheck")
+    .setDescription("Check a user's vouches")
+    .addUserOption(option =>
+      option
+        .setName("user")
+        .setDescription("User to check")
+        .setRequired(true)
+    )
     .toJSON()
+
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);

@@ -29,10 +29,7 @@ const commands = [
     .setName("say")
     .setDescription("Make the bot say something")
     .addStringOption(option =>
-      option
-        .setName("message")
-        .setDescription("Message to send")
-        .setRequired(true)
+      option.setName("message").setDescription("Message to send").setRequired(true)
     )
     .toJSON(),
 
@@ -40,22 +37,13 @@ const commands = [
     .setName("vouch")
     .setDescription("Give a vouch to a user")
     .addUserOption(option =>
-      option
-        .setName("user")
-        .setDescription("User to vouch")
-        .setRequired(true)
+      option.setName("user").setDescription("User to vouch").setRequired(true)
     )
     .addStringOption(option =>
-      option
-        .setName("message")
-        .setDescription("Vouch message")
-        .setRequired(true)
+      option.setName("message").setDescription("Vouch message").setRequired(true)
     )
     .addChannelOption(option =>
-      option
-        .setName("channel")
-        .setDescription("Channel to send the vouch")
-        .setRequired(true)
+      option.setName("channel").setDescription("Channel to send the vouch").setRequired(true)
     )
     .toJSON(),
 
@@ -63,10 +51,7 @@ const commands = [
     .setName("vouchcheck")
     .setDescription("Check a user's vouches")
     .addUserOption(option =>
-      option
-        .setName("user")
-        .setDescription("User to check")
-        .setRequired(true)
+      option.setName("user").setDescription("User to check").setRequired(true)
     )
     .toJSON()
 
@@ -76,17 +61,16 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
 (async () => {
   try {
-    console.log("Registering commands...");
+    console.log("Registering GLOBAL commands...");
 
     await rest.put(
-      Routes.applicationGuildCommands(
-        "1530223484599533689",
-        "1522931483587776552"
+      Routes.applicationCommands(
+        "1530223484599533689"
       ),
       { body: commands }
     );
 
-    console.log("✅ Commands registered!");
+    console.log("✅ Global commands registered!");
   } catch (error) {
     console.error(error);
   }

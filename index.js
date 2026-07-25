@@ -18,13 +18,12 @@ client.once(Events.ClientReady, () => {
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
-  // ORDER COMMAND
+  // ORDER
   if (interaction.commandName === "order") {
 
     if (interaction.guild.ownerId !== interaction.user.id) {
       return interaction.reply({
-        content: "❌ Only the server owner can use this command.",
-        ephemeral: true
+        content: "❌ Only the server owner can use this command."
       });
     }
 
@@ -35,9 +34,11 @@ client.on(Events.InteractionCreate, async interaction => {
     const channel = interaction.options.getChannel("channel");
     const image = interaction.options.getAttachment("image");
 
-    const data = JSON.parse(
-      fs.readFileSync("./orders.json", "utf8")
-    );
+    let data = { lastOrderId: 0 };
+
+    if (fs.existsSync("./orders.json")) {
+      data = JSON.parse(fs.readFileSync("./orders.json", "utf8"));
+    }
 
     data.lastOrderId++;
 
@@ -73,27 +74,21 @@ client.on(Events.InteractionCreate, async interaction => {
       )
       .setTimestamp();
 
-    if (image) {
-      embed.setImage(image.url);
-    }
+    if (image) embed.setImage(image.url);
 
-    await channel.send({
-      embeds: [embed]
-    });
+    await channel.send({ embeds: [embed] });
 
     return interaction.reply({
-      content: `✅ Order #${orderId} created.`,
-      ephemeral: true
+      content: `✅ Order #${orderId} created.`
     });
   }
 
-  // SAY COMMAND
+  // SAY
   if (interaction.commandName === "say") {
 
     if (interaction.guild.ownerId !== interaction.user.id) {
       return interaction.reply({
-        content: "❌ Only the server owner can use this command.",
-        ephemeral: true
+        content: "❌ Only the server owner can use this command."
       });
     }
 
@@ -102,8 +97,7 @@ client.on(Events.InteractionCreate, async interaction => {
     await interaction.channel.send(message);
 
     return interaction.reply({
-      content: "✅ Message sent.",
-      ephemeral: true
+      content: "✅ Message sent."
     });
   }
 });

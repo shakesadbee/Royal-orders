@@ -19,17 +19,14 @@ function parseDuration(time) {
 
   const amount = Number(match[1]);
 
-  if (time.endsWith("m")) {
+  if (time.endsWith("m"))
     return amount * 60 * 1000;
-  }
 
-  if (time.endsWith("h")) {
+  if (time.endsWith("h"))
     return amount * 60 * 60 * 1000;
-  }
 
-  if (time.endsWith("d")) {
+  if (time.endsWith("d"))
     return amount * 24 * 60 * 60 * 1000;
-  }
 }
 
 
@@ -47,12 +44,12 @@ client.once(Events.ClientReady, () => {
 
 client.on(Events.InteractionCreate, async interaction => {
 
-
-if (!interaction.isChatInputCommand() && !interaction.isButton()) return;
+  if (!interaction.isChatInputCommand()) return;
 
 
 
 // ================= ORDER =================
+
 
 if (interaction.commandName === "order") {
 
@@ -60,9 +57,11 @@ if (interaction.commandName === "order") {
 if (!interaction.member.permissions.has(
   PermissionsBitField.Flags.Administrator
 )) {
-  return interaction.reply({
-    content:"❌ You need Administrator permission."
-  });
+
+return interaction.reply({
+content:"❌ You need Administrator permission."
+});
+
 }
 
 
@@ -74,13 +73,17 @@ const channel = interaction.options.getChannel("channel");
 const image = interaction.options.getAttachment("image");
 
 
-let data = {lastOrderId:0};
+let data = {
+lastOrderId:0
+};
 
 
 if(fs.existsSync("./orders.json")) {
- data = JSON.parse(
-  fs.readFileSync("./orders.json","utf8")
- );
+
+data = JSON.parse(
+fs.readFileSync("./orders.json","utf8")
+);
+
 }
 
 
@@ -88,50 +91,63 @@ data.lastOrderId++;
 
 
 fs.writeFileSync(
- "./orders.json",
- JSON.stringify(data,null,2)
+"./orders.json",
+JSON.stringify(data,null,2)
 );
 
 
-const orderId = String(data.lastOrderId).padStart(4,"0");
+const id = String(data.lastOrderId)
+.padStart(4,"0");
+
 
 
 const embed = new EmbedBuilder()
+
 .setColor("#8b5cf6")
-.setTitle(`👑 ORDER #${orderId}`)
+
+.setTitle(`👑 ORDER #${id}`)
+
 .addFields(
+
 {
- name:"👤 Customer",
- value:`${customer}`
+name:"👤 Customer",
+value:`${customer}`
 },
+
 {
- name:"💰 Price",
- value:price
+name:"💰 Price",
+value:price
 },
+
 {
- name:"📦 Service",
- value:service
+name:"📦 Service",
+value:service
 },
+
 {
- name:"📝 Details",
- value:details
+name:"📝 Details",
+value:details
 }
+
 )
+
 .setTimestamp();
 
 
+
 if(image){
- embed.setImage(image.url);
+embed.setImage(image.url);
 }
 
 
+
 await channel.send({
- embeds:[embed]
+embeds:[embed]
 });
 
 
 return interaction.reply({
- content:`✅ Order #${orderId} created.`
+content:`✅ Order #${id} created.`
 });
 
 
@@ -142,15 +158,17 @@ return interaction.reply({
 // ================= SAY =================
 
 
-if(interaction.commandName === "say") {
+if (interaction.commandName === "say") {
 
 
-if(!interaction.member.permissions.has(
- PermissionsBitField.Flags.Administrator
+if (!interaction.member.permissions.has(
+PermissionsBitField.Flags.Administrator
 )) {
- return interaction.reply({
-  content:"❌ You need Administrator permission."
- });
+
+return interaction.reply({
+content:"❌ You need Administrator permission."
+});
+
 }
 
 
@@ -162,12 +180,13 @@ await interaction.channel.send(message);
 
 
 return interaction.reply({
- content:"✅ Message sent."
+content:"✅ Message sent."
 });
 
 
 }
   // ================= VOUCH =================
+
 
 if (interaction.commandName === "vouch") {
 
@@ -178,14 +197,14 @@ const channel = interaction.options.getChannel("channel");
 
 
 let vouchData = {
- lastVouchId:0
+  lastVouchId: 0
 };
 
 
-if(fs.existsSync("./vouches.json")) {
+if (fs.existsSync("./vouches.json")) {
 
 vouchData = JSON.parse(
- fs.readFileSync("./vouches.json","utf8")
+  fs.readFileSync("./vouches.json","utf8")
 );
 
 }
@@ -195,8 +214,8 @@ vouchData.lastVouchId++;
 
 
 fs.writeFileSync(
- "./vouches.json",
- JSON.stringify(vouchData,null,2)
+"./vouches.json",
+JSON.stringify(vouchData,null,2)
 );
 
 
@@ -204,18 +223,17 @@ fs.writeFileSync(
 let counts = {};
 
 
-if(fs.existsSync("./vouchCounts.json")) {
+if (fs.existsSync("./vouchCounts.json")) {
 
 counts = JSON.parse(
- fs.readFileSync("./vouchCounts.json","utf8")
+  fs.readFileSync("./vouchCounts.json","utf8")
 );
 
 }
 
 
-
-if(!counts[user.id]) {
- counts[user.id] = 0;
+if (!counts[user.id]) {
+  counts[user.id] = 0;
 }
 
 
@@ -223,8 +241,8 @@ counts[user.id]++;
 
 
 fs.writeFileSync(
- "./vouchCounts.json",
- JSON.stringify(counts,null,2)
+"./vouchCounts.json",
+JSON.stringify(counts,null,2)
 );
 
 
@@ -243,23 +261,23 @@ const embed = new EmbedBuilder()
 .addFields(
 
 {
- name:"👤 User",
- value:`${user}`
+name:"👤 User",
+value:`${user}`
 },
 
 {
- name:"📝 Message",
- value:message
+name:"📝 Message",
+value:message
 },
 
 {
- name:"🌟 Given By",
- value:`${interaction.user}`
+name:"🌟 Given By",
+value:`${interaction.user}`
 },
 
 {
- name:"🏆 Total Vouches",
- value:`${counts[user.id]}`
+name:"🏆 Total Vouches",
+value:`${counts[user.id]}`
 }
 
 )
@@ -269,12 +287,12 @@ const embed = new EmbedBuilder()
 
 
 await channel.send({
- embeds:[embed]
+embeds:[embed]
 });
 
 
 return interaction.reply({
- content:`✅ Vouch #${id} created.`
+content:`✅ Vouch #${id} created.`
 });
 
 
@@ -285,7 +303,7 @@ return interaction.reply({
 // ================= VOUCH CHECK =================
 
 
-if(interaction.commandName === "vouchcheck") {
+if (interaction.commandName === "vouchcheck") {
 
 
 const user = interaction.options.getUser("user");
@@ -294,13 +312,14 @@ const user = interaction.options.getUser("user");
 let counts = {};
 
 
-if(fs.existsSync("./vouchCounts.json")) {
+if (fs.existsSync("./vouchCounts.json")) {
 
 counts = JSON.parse(
- fs.readFileSync("./vouchCounts.json","utf8")
+fs.readFileSync("./vouchCounts.json","utf8")
 );
 
 }
+
 
 
 const total = counts[user.id] || 0;
@@ -316,13 +335,13 @@ const embed = new EmbedBuilder()
 .addFields(
 
 {
- name:"👤 User",
- value:`${user}`
+name:"👤 User",
+value:`${user}`
 },
 
 {
- name:"🏆 Total Vouches",
- value:`${total}`
+name:"🏆 Total Vouches",
+value:`${total}`
 }
 
 );
@@ -330,22 +349,23 @@ const embed = new EmbedBuilder()
 
 
 return interaction.reply({
- embeds:[embed]
+embeds:[embed]
 });
 
 
 }
-  // ================= GIVEAWAY =================
+  // ================= GIVEAWAY CREATE =================
+
 
 if (interaction.commandName === "giveaway") {
 
 
-if(!interaction.member.permissions.has(
- PermissionsBitField.Flags.Administrator
+if (!interaction.member.permissions.has(
+PermissionsBitField.Flags.Administrator
 )) {
 
 return interaction.reply({
- content:"❌ You need Administrator permission."
+content:"❌ You need Administrator permission."
 });
 
 }
@@ -361,10 +381,10 @@ const channel = interaction.options.getChannel("channel");
 const time = parseDuration(duration);
 
 
-if(!time) {
+if (!time) {
 
 return interaction.reply({
- content:"❌ Use format like 1m, 1h, 1d"
+content:"❌ Use format: 1m, 1h, 1d"
 });
 
 }
@@ -372,9 +392,10 @@ return interaction.reply({
 
 
 let data = {
- lastGiveawayId:0,
- giveaways:{}
+lastGiveawayId:0,
+giveaways:{}
 };
+
 
 
 if(fs.existsSync("./giveaways.json")) {
@@ -397,24 +418,19 @@ const id = String(data.lastGiveawayId)
 
 data.giveaways[id] = {
 
-prize:prize,
+prize: prize,
 
-winners:winners,
+winners: winners,
 
-users:[],
+users: [],
 
-endTime:Date.now()+time,
+endTime: Date.now() + time,
 
-channel:channel.id
+channel: channel.id,
+
+messageId: null
 
 };
-
-
-
-fs.writeFileSync(
-"./giveaways.json",
-JSON.stringify(data,null,2)
-);
 
 
 
@@ -452,7 +468,12 @@ value:`${winners}`
 },
 
 {
-name:"⏰ Ends",
+name:"👥 Participants",
+value:"0"
+},
+
+{
+name:"⏰ Duration",
 value:duration
 }
 
@@ -462,7 +483,7 @@ value:duration
 
 
 
-await channel.send({
+const msg = await channel.send({
 
 embeds:[embed],
 
@@ -472,126 +493,34 @@ components:[row]
 
 
 
-interaction.reply({
-content:`✅ Giveaway #${id} started.`
-});
-
-
-
-// AUTO END
-
-setTimeout(async()=>{
-
-
-let file = JSON.parse(
-fs.readFileSync("./giveaways.json","utf8")
-);
-
-
-let giveaway = file.giveaways[id];
-
-
-if(!giveaway) return;
-
-
-
-let users = giveaway.users;
-
-
-if(users.length === 0) {
-
-channel.send("❌ No one joined the giveaway.");
-
-return;
-
-}
-
-
-
-let winnersList = [];
-
-
-while(
-winnersList.length < giveaway.winners &&
-users.length > 0
-){
-
-let random = Math.floor(
-Math.random()*users.length
-);
-
-
-winnersList.push(
-users[random]
-);
-
-
-users.splice(random,1);
-
-}
-
-
-
-const winText = winnersList
-.map(x=>`<@${x}>`)
-.join("\n");
-
-
-
-channel.send({
-
-embeds:[
-
-new EmbedBuilder()
-
-.setColor("#00ff00")
-
-.setTitle("🎉 Giveaway Ended!")
-
-.addFields(
-
-{
-name:"🎁 Prize",
-value:giveaway.prize
-},
-
-{
-name:"🏆 Winners",
-value:winText
-}
-
-)
-
-]
-
-});
-
-
-delete file.giveaways[id];
+data.giveaways[id].messageId = msg.id;
 
 
 fs.writeFileSync(
 "./giveaways.json",
-JSON.stringify(file,null,2)
+JSON.stringify(data,null,2)
 );
 
 
-}, time);
 
+return interaction.reply({
+
+content:`✅ Giveaway #${id} started.`
+
+});
 
 
 }
-
 
 
 
 // ================= GIVEAWAY BUTTON =================
 
 
-if(interaction.isButton()) {
+if (interaction.isButton()) {
 
 
-if(!interaction.customId.startsWith("join_"))
+if (!interaction.customId.startsWith("join_"))
 return;
 
 
@@ -609,7 +538,10 @@ fs.readFileSync("./giveaways.json","utf8")
 
 
 
-if(!data.giveaways[id]) {
+const giveaway = data.giveaways[id];
+
+
+if (!giveaway) {
 
 return interaction.reply({
 
@@ -623,7 +555,7 @@ ephemeral:true
 
 
 
-if(data.giveaways[id].users.includes(
+if (giveaway.users.includes(
 interaction.user.id
 )) {
 
@@ -639,7 +571,7 @@ ephemeral:true
 
 
 
-data.giveaways[id].users.push(
+giveaway.users.push(
 interaction.user.id
 );
 
@@ -652,26 +584,182 @@ JSON.stringify(data,null,2)
 
 
 
+const oldEmbed = interaction.message.embeds[0];
+
+
+const newEmbed = EmbedBuilder.from(oldEmbed);
+
+
+newEmbed.spliceFields(
+2,
+1,
+{
+name:"👥 Participants",
+value:`${giveaway.users.length}`
+}
+);
+
+
+
+await interaction.message.edit({
+
+embeds:[newEmbed]
+
+});
+
+
+
 return interaction.reply({
 
-content:"🎉 Joined giveaway!",
+content:"🎉 You joined the giveaway!",
 
 ephemeral:true
 
+});
+
+
+}
+  // ================= AUTO GIVEAWAY END CHECK =================
+
+
+setInterval(async () => {
+
+
+if (!fs.existsSync("./giveaways.json")) return;
+
+
+let data = JSON.parse(
+fs.readFileSync("./giveaways.json","utf8")
+);
+
+
+
+for (const id in data.giveaways) {
+
+
+const giveaway = data.giveaways[id];
+
+
+if (Date.now() >= giveaway.endTime) {
+
+
+const channel = await client.channels.fetch(
+giveaway.channel
+).catch(()=>null);
+
+
+
+if (!channel) continue;
+
+
+
+let users = [...giveaway.users];
+
+
+if (users.length === 0) {
+
+await channel.send(
+`❌ Giveaway #${id} ended with no participants.`
+);
+
+} else {
+
+
+let winners = [];
+
+
+while (
+winners.length < giveaway.winners &&
+users.length > 0
+) {
+
+const random =
+Math.floor(Math.random()*users.length);
+
+
+winners.push(
+users[random]
+);
+
+
+users.splice(random,1);
+
+}
+
+
+
+const winnerText = winners
+.map(user => `<@${user}>`)
+.join("\n");
+
+
+
+const embed = new EmbedBuilder()
+
+.setColor("#00ff00")
+
+.setTitle("🎉 Giveaway Ended!")
+
+.addFields(
+
+{
+name:"🎁 Prize",
+value:giveaway.prize
+},
+
+{
+name:"🏆 Winners",
+value:winnerText
+},
+
+{
+name:"👥 Participants",
+value:`${giveaway.users.length}`
+}
+
+)
+
+.setTimestamp();
+
+
+
+await channel.send({
+embeds:[embed]
 });
 
 }
 
 
 
+delete data.giveaways[id];
+
+
+fs.writeFileSync(
+"./giveaways.json",
+JSON.stringify(data,null,2)
+);
+
+
+}
+
+
+
+}
+
+
+}, 5000);
+
+
+
+
 // ================= REROLL =================
 
 
-if(interaction.commandName === "reroll") {
+if (interaction.commandName === "reroll") {
 
 
-if(!interaction.member.permissions.has(
- PermissionsBitField.Flags.Administrator
+if (!interaction.member.permissions.has(
+PermissionsBitField.Flags.Administrator
 )) {
 
 return interaction.reply({
@@ -682,7 +770,19 @@ content:"❌ You need Administrator permission."
 
 
 
-const id = interaction.options.getString("id");
+const id =
+interaction.options.getString("id");
+
+
+
+if (!fs.existsSync("./giveaways.json")) {
+
+return interaction.reply({
+content:"❌ No giveaways found."
+});
+
+}
+
 
 
 let data = JSON.parse(
@@ -694,7 +794,8 @@ fs.readFileSync("./giveaways.json","utf8")
 const giveaway = data.giveaways[id];
 
 
-if(!giveaway) {
+
+if (!giveaway) {
 
 return interaction.reply({
 content:"❌ Giveaway not found."
@@ -704,7 +805,7 @@ content:"❌ Giveaway not found."
 
 
 
-if(giveaway.users.length === 0){
+if (giveaway.users.length === 0) {
 
 return interaction.reply({
 content:"❌ No participants."
@@ -714,17 +815,37 @@ content:"❌ No participants."
 
 
 
-const winner =
-giveaway.users[
-Math.floor(Math.random()*giveaway.users.length)
-];
+let users = [...giveaway.users];
+
+
+let winners = [];
+
+
+
+while (
+winners.length < giveaway.winners &&
+users.length > 0
+) {
+
+
+const random =
+Math.floor(Math.random()*users.length);
+
+
+winners.push(users[random]);
+
+
+users.splice(random,1);
+
+
+}
 
 
 
 return interaction.reply({
 
 content:
-`🔄 Rerolled!\n🏆 New winner: <@${winner}>`
+`🔄 Giveaway #${id} rerolled!\n🏆 New winners:\n${winners.map(x=>`<@${x}>`).join("\n")}`
 
 });
 
@@ -732,7 +853,9 @@ content:
 }
 
 
+
 });
+
 
 
 client.login(process.env.TOKEN);

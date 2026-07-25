@@ -90,3 +90,13 @@ const rest = new REST({ version: "10" })
   }
 
 })();
+new SlashCommandBuilder()
+  .setName("say")
+  .setDescription("Make the bot say something")
+  .addStringOption(option =>
+    option
+      .setName("message")
+      .setDescription("Message to send")
+      .setRequired(true)
+  )
+  .toJSON()

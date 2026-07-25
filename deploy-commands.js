@@ -1,32 +1,26 @@
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const commands = [
-
-  new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Replies with Pong!")
-    .toJSON(),
-
   new SlashCommandBuilder()
     .setName("order")
     .setDescription("Create a new order")
     .addUserOption(option =>
-      option.setName("customer").setDescription("Select customer").setRequired(true)
+      option.setName("customer").setDescription("Customer").setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("service").setDescription("Service name").setRequired(true)
+      option.setName("service").setDescription("Service").setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("price").setDescription("Order price").setRequired(true)
+      option.setName("price").setDescription("Price").setRequired(true)
     )
     .addStringOption(option =>
-      option.setName("details").setDescription("Order details").setRequired(true)
+      option.setName("details").setDescription("Details").setRequired(true)
     )
     .addChannelOption(option =>
-      option.setName("channel").setDescription("Channel where order will be sent").setRequired(true)
+      option.setName("channel").setDescription("Channel").setRequired(true)
     )
     .addAttachmentOption(option =>
-      option.setName("image").setDescription("Add order image").setRequired(false)
+      option.setName("image").setDescription("Image").setRequired(false)
     )
     .toJSON(),
 
@@ -40,7 +34,6 @@ const commands = [
         .setRequired(true)
     )
     .toJSON()
-
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -57,7 +50,7 @@ const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
       { body: commands }
     );
 
-    console.log("✅ Commands registered successfully!");
+    console.log("✅ Commands registered!");
   } catch (error) {
     console.error(error);
   }

@@ -13,6 +13,7 @@ const fs = require("fs");
 
 
 function parseDuration(time) {
+
   const match = time.match(/^(\d+)(m|h|d)$/);
 
   if (!match) return null;
@@ -30,6 +31,7 @@ function parseDuration(time) {
 }
 
 
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds
@@ -37,14 +39,22 @@ const client = new Client({
 });
 
 
+
 client.once(Events.ClientReady, () => {
+
   console.log(`Logged in as ${client.user.tag}`);
+
 });
+
 
 
 client.on(Events.InteractionCreate, async interaction => {
 
-  if (!interaction.isChatInputCommand()) return;
+
+  if (
+    !interaction.isChatInputCommand() &&
+    !interaction.isButton()
+  ) return;
 
 
 
@@ -65,6 +75,7 @@ content:"❌ You need Administrator permission."
 }
 
 
+
 const customer = interaction.options.getUser("customer");
 const service = interaction.options.getString("service");
 const price = interaction.options.getString("price");
@@ -73,9 +84,11 @@ const channel = interaction.options.getChannel("channel");
 const image = interaction.options.getAttachment("image");
 
 
+
 let data = {
-lastOrderId:0
+ lastOrderId:0
 };
+
 
 
 if(fs.existsSync("./orders.json")) {
@@ -87,7 +100,9 @@ fs.readFileSync("./orders.json","utf8")
 }
 
 
+
 data.lastOrderId++;
+
 
 
 fs.writeFileSync(
@@ -96,7 +111,8 @@ JSON.stringify(data,null,2)
 );
 
 
-const id = String(data.lastOrderId)
+
+const orderId = String(data.lastOrderId)
 .padStart(4,"0");
 
 
@@ -105,7 +121,7 @@ const embed = new EmbedBuilder()
 
 .setColor("#8b5cf6")
 
-.setTitle(`👑 ORDER #${id}`)
+.setTitle(`👑 ORDER #${orderId}`)
 
 .addFields(
 
@@ -135,19 +151,26 @@ value:details
 
 
 
-if(image){
+if(image) {
+
 embed.setImage(image.url);
+
 }
 
 
 
 await channel.send({
+
 embeds:[embed]
+
 });
 
 
+
 return interaction.reply({
-content:`✅ Order #${id} created.`
+
+content:`✅ Order #${orderId} created.`
+
 });
 
 
@@ -166,21 +189,28 @@ PermissionsBitField.Flags.Administrator
 )) {
 
 return interaction.reply({
+
 content:"❌ You need Administrator permission."
+
 });
 
 }
+
 
 
 const message =
 interaction.options.getString("message");
 
 
+
 await interaction.channel.send(message);
 
 
+
 return interaction.reply({
+
 content:"✅ Message sent."
+
 });
 
 
@@ -196,9 +226,11 @@ const message = interaction.options.getString("message");
 const channel = interaction.options.getChannel("channel");
 
 
+
 let vouchData = {
   lastVouchId: 0
 };
+
 
 
 if (fs.existsSync("./vouches.json")) {
@@ -210,7 +242,9 @@ vouchData = JSON.parse(
 }
 
 
+
 vouchData.lastVouchId++;
+
 
 
 fs.writeFileSync(
@@ -220,7 +254,9 @@ JSON.stringify(vouchData,null,2)
 
 
 
+
 let counts = {};
+
 
 
 if (fs.existsSync("./vouchCounts.json")) {
@@ -232,12 +268,17 @@ counts = JSON.parse(
 }
 
 
+
 if (!counts[user.id]) {
-  counts[user.id] = 0;
+
+counts[user.id] = 0;
+
 }
 
 
+
 counts[user.id]++;
+
 
 
 fs.writeFileSync(
@@ -247,7 +288,7 @@ JSON.stringify(counts,null,2)
 
 
 
-const id = String(vouchData.lastVouchId)
+const vouchId = String(vouchData.lastVouchId)
 .padStart(4,"0");
 
 
@@ -256,7 +297,7 @@ const embed = new EmbedBuilder()
 
 .setColor("#00ff99")
 
-.setTitle(`⭐ VOUCH #${id}`)
+.setTitle(`⭐ VOUCH #${vouchId}`)
 
 .addFields(
 
@@ -287,16 +328,23 @@ value:`${counts[user.id]}`
 
 
 await channel.send({
+
 embeds:[embed]
+
 });
 
 
+
 return interaction.reply({
-content:`✅ Vouch #${id} created.`
+
+content:`✅ Vouch #${vouchId} created.`
+
 });
 
 
 }
+
+
 
 
 
@@ -309,7 +357,9 @@ if (interaction.commandName === "vouchcheck") {
 const user = interaction.options.getUser("user");
 
 
+
 let counts = {};
+
 
 
 if (fs.existsSync("./vouchCounts.json")) {
@@ -349,19 +399,20 @@ value:`${total}`
 
 
 return interaction.reply({
+
 embeds:[embed]
+
 });
 
 
 }
   // ================= GIVEAWAY CREATE =================
 
-
 if (interaction.commandName === "giveaway") {
 
 
 if (!interaction.member.permissions.has(
-PermissionsBitField.Flags.Administrator
+  PermissionsBitField.Flags.Administrator
 )) {
 
 return interaction.reply({
@@ -398,7 +449,7 @@ giveaways:{}
 
 
 
-if(fs.existsSync("./giveaways.json")) {
+if (fs.existsSync("./giveaways.json")) {
 
 data = JSON.parse(
 fs.readFileSync("./giveaways.json","utf8")
@@ -424,9 +475,9 @@ winners: winners,
 
 users: [],
 
-endTime: Date.now() + time,
-
 channel: channel.id,
+
+endTime: Date.now() + time,
 
 messageId: null
 
@@ -445,6 +496,7 @@ const button = new ButtonBuilder()
 
 
 const row = new ActionRowBuilder()
+
 .addComponents(button);
 
 
@@ -483,7 +535,7 @@ value:duration
 
 
 
-const msg = await channel.send({
+const message = await channel.send({
 
 embeds:[embed],
 
@@ -493,7 +545,8 @@ components:[row]
 
 
 
-data.giveaways[id].messageId = msg.id;
+data.giveaways[id].messageId = message.id;
+
 
 
 fs.writeFileSync(
@@ -509,12 +562,11 @@ content:`✅ Giveaway #${id} started.`
 
 });
 
-
 }
 
 
 
-// ================= GIVEAWAY BUTTON =================
+// ================= JOIN BUTTON =================
 
 
 if (interaction.isButton()) {
@@ -541,13 +593,14 @@ fs.readFileSync("./giveaways.json","utf8")
 const giveaway = data.giveaways[id];
 
 
+
 if (!giveaway) {
 
 return interaction.reply({
 
 content:"❌ Giveaway ended.",
 
-ephemeral:true
+flags:64
 
 });
 
@@ -563,7 +616,7 @@ return interaction.reply({
 
 content:"❌ You already joined.",
 
-ephemeral:true
+flags:64
 
 });
 
@@ -590,6 +643,7 @@ const oldEmbed = interaction.message.embeds[0];
 const newEmbed = EmbedBuilder.from(oldEmbed);
 
 
+
 newEmbed.spliceFields(
 2,
 1,
@@ -613,14 +667,13 @@ return interaction.reply({
 
 content:"🎉 You joined the giveaway!",
 
-ephemeral:true
+flags:64
 
 });
 
 
 }
-  // ================= AUTO GIVEAWAY END CHECK =================
-
+  // ================= AUTO GIVEAWAY END =================
 
 setInterval(async () => {
 
@@ -640,7 +693,9 @@ for (const id in data.giveaways) {
 const giveaway = data.giveaways[id];
 
 
+
 if (Date.now() >= giveaway.endTime) {
+
 
 
 const channel = await client.channels.fetch(
@@ -656,16 +711,22 @@ if (!channel) continue;
 let users = [...giveaway.users];
 
 
+
 if (users.length === 0) {
 
+
 await channel.send(
-`❌ Giveaway #${id} ended with no participants.`
+`❌ Giveaway #${id} ended. No participants.`
 );
+
+
 
 } else {
 
 
+
 let winners = [];
+
 
 
 while (
@@ -673,24 +734,21 @@ winners.length < giveaway.winners &&
 users.length > 0
 ) {
 
+
 const random =
 Math.floor(Math.random()*users.length);
 
 
-winners.push(
-users[random]
-);
+
+winners.push(users[random]);
+
 
 
 users.splice(random,1);
 
+
+
 }
-
-
-
-const winnerText = winners
-.map(user => `<@${user}>`)
-.join("\n");
 
 
 
@@ -709,7 +767,7 @@ value:giveaway.prize
 
 {
 name:"🏆 Winners",
-value:winnerText
+value:winners.map(x=>`<@${x}>`).join("\n")
 },
 
 {
@@ -724,8 +782,12 @@ value:`${giveaway.users.length}`
 
 
 await channel.send({
+
 embeds:[embed]
+
 });
+
+
 
 }
 
@@ -734,20 +796,24 @@ embeds:[embed]
 delete data.giveaways[id];
 
 
+
 fs.writeFileSync(
 "./giveaways.json",
 JSON.stringify(data,null,2)
 );
 
 
-}
-
-
 
 }
 
 
-}, 5000);
+
+}
+
+
+
+},5000);
+
 
 
 
@@ -758,13 +824,18 @@ JSON.stringify(data,null,2)
 if (interaction.commandName === "reroll") {
 
 
+
 if (!interaction.member.permissions.has(
 PermissionsBitField.Flags.Administrator
 )) {
 
+
 return interaction.reply({
+
 content:"❌ You need Administrator permission."
+
 });
+
 
 }
 
@@ -777,9 +848,13 @@ interaction.options.getString("id");
 
 if (!fs.existsSync("./giveaways.json")) {
 
+
 return interaction.reply({
+
 content:"❌ No giveaways found."
+
 });
+
 
 }
 
@@ -797,9 +872,13 @@ const giveaway = data.giveaways[id];
 
 if (!giveaway) {
 
+
 return interaction.reply({
+
 content:"❌ Giveaway not found."
+
 });
+
 
 }
 
@@ -807,16 +886,19 @@ content:"❌ Giveaway not found."
 
 if (giveaway.users.length === 0) {
 
+
 return interaction.reply({
+
 content:"❌ No participants."
+
 });
+
 
 }
 
 
 
 let users = [...giveaway.users];
-
 
 let winners = [];
 
@@ -832,10 +914,13 @@ const random =
 Math.floor(Math.random()*users.length);
 
 
+
 winners.push(users[random]);
 
 
+
 users.splice(random,1);
+
 
 
 }
@@ -845,9 +930,10 @@ users.splice(random,1);
 return interaction.reply({
 
 content:
-`🔄 Giveaway #${id} rerolled!\n🏆 New winners:\n${winners.map(x=>`<@${x}>`).join("\n")}`
+`🔄 Giveaway #${id} rerolled!\n🏆 Winners:\n${winners.map(x=>`<@${x}>`).join("\n")}`
 
 });
+
 
 
 }

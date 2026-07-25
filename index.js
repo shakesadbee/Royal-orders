@@ -92,3 +92,21 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 client.login(process.env.TOKEN);
+if (interaction.commandName === "say") {
+
+  if (interaction.guild.ownerId !== interaction.user.id) {
+    return interaction.reply({
+      content: "❌ Only the server owner can use this command.",
+      ephemeral: true
+    });
+  }
+
+  const message = interaction.options.getString("message");
+
+  await interaction.channel.send(message);
+
+  return interaction.reply({
+    content: "✅ Message sent.",
+    ephemeral: true
+  });
+}

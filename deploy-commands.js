@@ -25,7 +25,6 @@ const commands = [
     )
     .toJSON(),
 
-
   new SlashCommandBuilder()
     .setName("say")
     .setDescription("Make the bot say something")
@@ -36,7 +35,6 @@ const commands = [
         .setRequired(true)
     )
     .toJSON(),
-
 
   new SlashCommandBuilder()
     .setName("vouch")
@@ -56,15 +54,14 @@ const commands = [
     .addChannelOption(option =>
       option
         .setName("channel")
-        .setDescription("Channel to send the vouch")
+        .setDescription("Channel to send vouch")
         .setRequired(true)
     )
     .toJSON(),
 
-
   new SlashCommandBuilder()
     .setName("vouchcheck")
-    .setDescription("Check a user's vouches")
+    .setDescription("Check user's vouches")
     .addUserOption(option =>
       option
         .setName("user")
@@ -72,7 +69,6 @@ const commands = [
         .setRequired(true)
     )
     .toJSON(),
-
 
   new SlashCommandBuilder()
     .setName("giveaway")
@@ -103,10 +99,9 @@ const commands = [
     )
     .toJSON(),
 
-
   new SlashCommandBuilder()
     .setName("reroll")
-    .setDescription("Reroll a giveaway")
+    .setDescription("Reroll a giveaway winner")
     .addStringOption(option =>
       option
         .setName("id")

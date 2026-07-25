@@ -2,7 +2,8 @@ const {
   Client,
   GatewayIntentBits,
   Events,
-  EmbedBuilder
+  EmbedBuilder,
+  PermissionsBitField
 } = require("discord.js");
 
 const fs = require("fs");
@@ -21,9 +22,13 @@ client.on(Events.InteractionCreate, async interaction => {
   // ORDER COMMAND
   if (interaction.commandName === "order") {
 
-    if (interaction.guild.ownerId !== interaction.user.id) {
+    if (
+      !interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+      )
+    ) {
       return interaction.reply({
-        content: "❌ Only the server owner can use this command."
+        content: "❌ You need Administrator permission to use this command."
       });
     }
 
@@ -90,9 +95,13 @@ client.on(Events.InteractionCreate, async interaction => {
   // SAY COMMAND
   if (interaction.commandName === "say") {
 
-    if (interaction.guild.ownerId !== interaction.user.id) {
+    if (
+      !interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+      )
+    ) {
       return interaction.reply({
-        content: "❌ Only the server owner can use this command."
+        content: "❌ You need Administrator permission to use this command."
       });
     }
 

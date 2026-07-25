@@ -18,7 +18,7 @@ client.once(Events.ClientReady, () => {
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
-  // ORDER
+  // ORDER COMMAND
   if (interaction.commandName === "order") {
 
     if (interaction.guild.ownerId !== interaction.user.id) {
@@ -74,16 +74,20 @@ client.on(Events.InteractionCreate, async interaction => {
       )
       .setTimestamp();
 
-    if (image) embed.setImage(image.url);
+    if (image) {
+      embed.setImage(image.url);
+    }
 
-    await channel.send({ embeds: [embed] });
+    await channel.send({
+      embeds: [embed]
+    });
 
     return interaction.reply({
       content: `✅ Order #${orderId} created.`
     });
   }
 
-  // SAY
+  // SAY COMMAND
   if (interaction.commandName === "say") {
 
     if (interaction.guild.ownerId !== interaction.user.id) {
@@ -98,6 +102,115 @@ client.on(Events.InteractionCreate, async interaction => {
 
     return interaction.reply({
       content: "✅ Message sent."
+    });
+  }
+
+  // VOUCH COMMAND
+  if (interaction.commandName === "vouch") {
+
+    const user = interaction.options.getUser("user");
+    const message = interaction.options.getString("message");
+    const channel = interaction.options.getChannel("channel");
+
+    let vouchData = { lastVouchId: 0 };
+
+    if (fs.existsSync("./vouches.json")) {
+      vouchData = JSON.parse(
+        fs.readFileSync("./vouches.json", "utf8")
+      );
+    }
+
+    vouchData.lastVouchId++;
+
+    fs.writeFileSync(
+      "./vouches.json",
+      JSON.stringify(vouchData, null, 2)
+    );
+
+    let counts = {};
+
+    if (fs.existsSync("./vouchCounts.json")) {
+      counts = JSON.parse(
+        fs.readFileSync("./vouchCounts.json", "utf8")
+      );
+    }
+
+    if (!counts[user.id]) {
+      counts[user.id] = 0;
+    }
+
+    counts[user.id]++;
+
+    fs.writeFileSync(
+      "./vouchCounts.json",
+      JSON.stringify(counts, null, 2)
+    );
+
+    const vouchId = String(vouchData.lastVouchId).padStart(4, "0");
+
+    const embed = new EmbedBuilder()
+      .setColor("#00ff99")
+      .setTitle(`⭐ VOUCH #${vouchId}`)
+      .addFields(
+        {
+          name: "👤 User",
+          value: `${user}`
+        },
+        {
+          name: "📝 Message",
+          value: message
+        },
+        {
+          name: "🌟 Given By",
+          value: `${interaction.user}`
+        },
+        {
+          name: "🏆 Total Vouches",
+          value: `${counts[user.id]}`
+        }
+      )
+      .setTimestamp();
+
+    await channel.send({
+      embeds: [embed]
+    });
+
+    return interaction.reply({
+      content: `✅ Vouch #${vouchId} created.`
+    });
+  }
+
+  // VOUCHCHECK COMMAND
+  if (interaction.commandName === "vouchcheck") {
+
+    const user = interaction.options.getUser("user");
+
+    let counts = {};
+
+    if (fs.existsSync("./vouchCounts.json")) {
+      counts = JSON.parse(
+        fs.readFileSync("./vouchCounts.json", "utf8")
+      );
+    }
+
+    const total = counts[user.id] || 0;
+
+    const embed = new EmbedBuilder()
+      .setColor("#ffd700")
+      .setTitle("⭐ Vouch Stats")
+      .addFields(
+        {
+          name: "👤 User",
+          value: `${user}`
+        },
+        {
+          name: "🏆 Total Vouches",
+          value: `${total}`
+        }
+      );
+
+    return interaction.reply({
+      embeds: [embed]
     });
   }
 });

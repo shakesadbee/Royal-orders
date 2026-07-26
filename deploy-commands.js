@@ -2,6 +2,7 @@ const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const commands = [
 
+  // ORDER
   new SlashCommandBuilder()
     .setName("order")
     .setDescription("Create a new order")
@@ -37,7 +38,7 @@ const commands = [
     )
     .toJSON(),
 
-
+  // SAY
   new SlashCommandBuilder()
     .setName("say")
     .setDescription("Make the bot say something")
@@ -48,7 +49,7 @@ const commands = [
     )
     .toJSON(),
 
-
+  // VOUCH
   new SlashCommandBuilder()
     .setName("vouch")
     .setDescription("Give a vouch to a user")
@@ -69,7 +70,7 @@ const commands = [
     )
     .toJSON(),
 
-
+  // VOUCH CHECK
   new SlashCommandBuilder()
     .setName("vouchcheck")
     .setDescription("Check user's vouches")
@@ -80,7 +81,7 @@ const commands = [
     )
     .toJSON(),
 
-
+  // GIVEAWAY
   new SlashCommandBuilder()
     .setName("giveaway")
     .setDescription("Create a giveaway")
@@ -106,41 +107,76 @@ const commands = [
     )
     .toJSON(),
 
-
+  // REROLL
   new SlashCommandBuilder()
     .setName("reroll")
     .setDescription("Reroll a giveaway")
     .addStringOption(option =>
       option.setName("id")
-        .setDescription("Giveaway ID (example: 0001)")
+        .setDescription("Giveaway ID")
+        .setRequired(true)
+    )
+    .toJSON(),
+
+  // STATUS CHANNEL
+  new SlashCommandBuilder()
+    .setName("setstatuschannel")
+    .setDescription("Set the status channel")
+    .addChannelOption(option =>
+      option.setName("channel")
+        .setDescription("Status channel")
+        .setRequired(true)
+    )
+    .toJSON(),
+
+  // CREATE STATUS MESSAGE
+  new SlashCommandBuilder()
+    .setName("createstatus")
+    .setDescription("Create the status embed")
+    .toJSON(),
+
+  // UPDATE STATUS
+  new SlashCommandBuilder()
+    .setName("status")
+    .setDescription("Update service status")
+    .addStringOption(option =>
+      option.setName("state")
+        .setDescription("Status")
+        .setRequired(true)
+        .addChoices(
+          { name: "Available", value: "available" },
+          { name: "Busy", value: "busy" },
+          { name: "Offline", value: "offline" }
+        )
+    )
+    .toJSON(),
+
+  // SETUPS
+  new SlashCommandBuilder()
+    .setName("setups")
+    .setDescription("Set available AFK setups")
+    .addIntegerOption(option =>
+      option.setName("amount")
+        .setDescription("Number of setups")
         .setRequired(true)
     )
     .toJSON()
 
 ];
 
-
-const rest = new REST({
-  version: "10"
-}).setToken(process.env.TOKEN);
-
+const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
 (async () => {
-
   try {
 
     console.log("Registering GLOBAL commands...");
-
 
     await rest.put(
       Routes.applicationCommands(
         "1530223484599533689"
       ),
-      {
-        body: commands
-      }
+      { body: commands }
     );
-
 
     console.log("✅ Global commands registered!");
 
@@ -150,5 +186,4 @@ const rest = new REST({
     console.error(error);
 
   }
-
 })();
